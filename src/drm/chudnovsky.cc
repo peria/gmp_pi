@@ -3,9 +3,10 @@
 #include <glog/logging.h>
 #include <gmp.h>
 #include <algorithm>
+#include <cstdio>
 #include "base/base.h"
 
-namespace peria {
+namespace pi {
 
 namespace {
 
@@ -26,13 +27,13 @@ void Chudnovsky::Init(int64 digits) {
 }
 
 void Chudnovsky::Compute(mpf_t pi) {
-  mpz_t a;
-  mpz_t b;
-  mpz_t c;
+  mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
   BinarySplit(0, num_terms_, a, b, c);
-
+  mpz_out_str(stdout, 10, a); std::puts("");
+  mpz_out_str(stdout, 10, b); std::puts("");
+  mpz_out_str(stdout, 10, c); std::puts("");
   mpz_clear(c);
 
   mpz_mul_ui(b, b, 12);
@@ -62,19 +63,20 @@ void Chudnovsky::Compute(mpf_t pi) {
   mpf_clears(p, q, NULL);
 }
 
-void Chudnovsky::BinarySplit(int64 low, int64 up, mpz_t a0, mpz_t b0, mpz_t c0) {
-  if (low + 1 >= up) {
+void Chudnovsky::BinarySplit(int64 low, int64 up,
+                             mpz_t a0, mpz_t b0, mpz_t c0) {
+  if (low + 1 == up) {
     SetValues(low, a0, b0, c0);
     return;
   }
 
-  mpz_t a1;
-  mpz_t b1;
-  mpz_t c1;
-  mpz_inits(a1, b1, c1, NULL);
 
   int64 mid = (low + up) / 2;
+
   BinarySplit(low, mid, a0, b0, c0);
+
+  mpz_t a1, b1, c1;
+  mpz_inits(a1, b1, c1, NULL);
   BinarySplit(mid, up, a1, b1, c1);
 
   mpz_mul(b0, b0, a1);
@@ -88,9 +90,14 @@ void Chudnovsky::BinarySplit(int64 low, int64 up, mpz_t a0, mpz_t b0, mpz_t c0) 
 
 void Chudnovsky::SetValues(int64 k, mpz_t a, mpz_t b, mpz_t c) {
   // a[k] = k^3 * C^3 / 24
-  mpz_set_ui(a, kConstC / 24 * k);
-  mpz_mul_ui(a, a, kConstC * k);
-  mpz_mul_ui(a, a, kConstC * k);
+  if (k == 0) {
+    mpz_set_ui(a, 1);
+  } else {
+    int64 base = kConstC * k;
+    mpz_set_ui(a, base / 24);
+    mpz_mul_ui(a, a, base);
+    mpz_mul_ui(a, a, base);
+  }
 
   // b[k] = A * k + B;
   mpz_set_ui(b, kConstA * k);
@@ -102,5 +109,5 @@ void Chudnovsky::SetValues(int64 k, mpz_t a, mpz_t b, mpz_t c) {
   mpz_mul_ui(c, c, 6 * k + 5);
 }
 
-}  // namespace peria
+}  // namespace pi
 

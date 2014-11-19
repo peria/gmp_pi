@@ -25,7 +25,7 @@ endif()
 function(pi_add_cxx_flags flags)
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
   else()
-    set(CMAKE_CXX_FLAGS "${flags} ${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flags}" PARENT_SCOPE)
   endif()
 endfunction()
 

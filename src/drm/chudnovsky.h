@@ -3,7 +3,7 @@
 #include "base/base.h"
 #include <gmp.h>
 
-namespace peria {
+namespace pi {
 
 class Chudnovsky {
  public:
@@ -22,4 +22,4 @@ class Chudnovsky {
   int64 num_terms_;
 };
 
-}  // namespace peria
+}  // namespace pi
