@@ -24,13 +24,15 @@ Chudnovsky::~Chudnovsky() {}
 
 void Chudnovsky::Init(int64 digits) {
   num_terms_ = digits / kDigsPerTerm + 5;
+  LOG(INFO) << "Computing terms: " << num_terms_;
+  LOG(INFO) << "Target digits: " << digits;
 }
 
 void Chudnovsky::Compute(mpf_t pi) {
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
-  BinarySplit(0, num_terms_, a, b, c, false);
+  BinarySplit(0, num_terms_, a, b, c);
   mpz_clear(c);
 
   mpz_mul_ui(b, b, 12);
@@ -64,7 +66,7 @@ void Chudnovsky::Compute(mpf_t pi) {
 }
 
 void Chudnovsky::BinarySplit(int64 low, int64 up,
-                             mpz_t a0, mpz_t b0, mpz_t c0, bool formar) {
+                             mpz_t a0, mpz_t b0, mpz_t c0) {
   if (low + 1 == up) {
     SetValues(low, a0, b0, c0);
     return;
@@ -72,18 +74,17 @@ void Chudnovsky::BinarySplit(int64 low, int64 up,
 
   int64 mid = (low + up) / 2;
 
-  BinarySplit(low, mid, a0, b0, c0, true);
+  BinarySplit(low, mid, a0, b0, c0);
 
   mpz_t a1, b1, c1;
   mpz_inits(a1, b1, c1, NULL);
-  BinarySplit(mid, up, a1, b1, c1, formar);
+  BinarySplit(mid, up, a1, b1, c1);
 
   mpz_mul(b0, b0, a1);
   mpz_mul(b1, b1, c0);
   mpz_add(b0, b0, b1);
   mpz_mul(a0, a0, a1);
-  if (!formar)
-    mpz_mul(c0, c0, c1);
+  mpz_mul(c0, c0, c1);
 
   mpz_clears(a1, b1, c1, NULL);
 }
