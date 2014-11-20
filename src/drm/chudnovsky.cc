@@ -4,6 +4,7 @@
 #include <gmp.h>
 #include <algorithm>
 #include <cstdio>
+
 #include "base/base.h"
 
 namespace pi {
@@ -18,21 +19,15 @@ const int64 kConstC = 640320;
 
 }  // namespace
 
-Chudnovsky::Chudnovsky() {}
-
-Chudnovsky::~Chudnovsky() {}
-
-void Chudnovsky::Init(int64 digits) {
-  num_terms_ = digits / kDigsPerTerm + 5;
-  LOG(INFO) << "Computing terms: " << num_terms_;
+void Chudnovsky::Compute(int64 digits, mpf_t pi) {
+  int64 num_terms = digits / kDigsPerTerm + 5;
+  LOG(INFO) << "Computing terms: " << num_terms;
   LOG(INFO) << "Target digits: " << digits;
-}
 
-void Chudnovsky::Compute(mpf_t pi) {
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
-  BinarySplit(0, num_terms_, a, b, c);
+  BinarySplit(0, num_terms, a, b, c);
   mpz_clear(c);
 
   mpz_mul_ui(b, b, 12);

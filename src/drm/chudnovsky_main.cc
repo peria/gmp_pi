@@ -12,12 +12,9 @@ int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
 
-  pi::Chudnovsky chudnovsky;
-  chudnovsky.Init(FLAGS_digits);
-
   mpf_t pi;
   mpf_init(pi);
-  chudnovsky.Compute(pi);
+  pi::Chudnovsky::Compute(FLAGS_digits, pi);
   if (FLAGS_verbose || FLAGS_digits < 100)
     mpf_out_str(stdout, 10, FLAGS_digits, pi);
   else
