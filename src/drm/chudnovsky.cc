@@ -2,8 +2,11 @@
 
 #include <glog/logging.h>
 #include <gmp.h>
+#include <sys/time.h>
 #include <algorithm>
 #include <cstdio>
+#include <ctime>
+#include <thread>
 
 #include "base/base.h"
 
@@ -17,18 +20,31 @@ const int64 kConstA = 545140134;
 const int64 kConstB = 13591409;
 const int64 kConstC = 640320;
 
+double GetTime() {
+  timeval t;
+  gettimeofday(&t, NULL);
+  return t.tv_sec + t.tv_usec * 1e-6;
+}
+  
 }  // namespace
 
 void Chudnovsky::Compute(int64 digits, mpf_t pi) {
+  double all_start = GetTime();
+
   int64 num_terms = digits / kDigsPerTerm + 5;
   LOG(INFO) << "Computing terms: " << num_terms;
   LOG(INFO) << "Target digits: " << digits;
+  int num_threads = std::thread::hardware_concurrency() * 2;
+  LOG(INFO) << "Number of threads: " << num_threads;
 
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
-  BinarySplit(0, num_terms, a, b, c);
+  double bs_start = GetTime();
+  BinarySplit(0, num_terms, a, b, c, num_threads);
+  double bs_end = GetTime();
   mpz_clear(c);
+  LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
 
   mpz_mul_ui(b, b, 12);
 
@@ -58,22 +74,34 @@ void Chudnovsky::Compute(int64 digits, mpf_t pi) {
   mpf_set(pi, p);
 
   mpf_clears(p, q, NULL);
+
+  double all_end = GetTime();
+  LOG(INFO) << "Time of computing: " << (all_end - all_start) << " sec.";
 }
 
 void Chudnovsky::BinarySplit(int64 low, int64 up,
-                             mpz_t a0, mpz_t b0, mpz_t c0) {
+                             mpz_t a0, mpz_t b0, mpz_t c0, int num_cpu) {
   if (low + 1 == up) {
     SetValues(low, a0, b0, c0);
     return;
   }
 
   int64 mid = (low + up) / 2;
-
-  BinarySplit(low, mid, a0, b0, c0);
+  int cpu0 = num_cpu / 2;
+  int cpu1 = num_cpu - cpu0;  // cpu0 <= cpu1
 
   mpz_t a1, b1, c1;
   mpz_inits(a1, b1, c1, NULL);
-  BinarySplit(mid, up, a1, b1, c1);
+  if (cpu0) {
+    std::thread th0([&a0, &b0, &c0, &low, &mid, &cpu0] {
+	BinarySplit(low, mid, a0, b0, c0, cpu0);
+    });
+    BinarySplit(mid, up, a1, b1, c1, cpu1);
+    th0.join();
+  } else {
+    BinarySplit(low, mid, a0, b0, c0, cpu0);
+    BinarySplit(mid, up, a1, b1, c1, cpu1);
+  }
 
   mpz_mul(b0, b0, a1);
   mpz_mul(b1, b1, c0);
