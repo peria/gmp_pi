@@ -10,6 +10,8 @@
 
 #include "base/base.h"
 
+DEFINE_int32(threads, 1, "Number of threads.  If you specify 0, all CPU cores are used.");
+
 namespace pi {
 
 namespace {
@@ -34,14 +36,15 @@ void Chudnovsky::Compute(int64 digits, mpf_t pi) {
   int64 num_terms = digits / kDigsPerTerm + 5;
   LOG(INFO) << "Computing terms: " << num_terms;
   LOG(INFO) << "Target digits: " << digits;
-  int num_threads = std::thread::hardware_concurrency() * 2;
-  LOG(INFO) << "Number of threads: " << num_threads;
+  if (FLAGS_threads < 1)
+    FLAGS_threads = std::thread::hardware_concurrency();
+  LOG(INFO) << "Number of threads: " << FLAGS_threads;
 
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
   double bs_start = GetTime();
-  BinarySplit(0, num_terms, a, b, c, num_threads);
+  BinarySplit(0, num_terms, a, b, c, FLAGS_threads);
   double bs_end = GetTime();
   mpz_clear(c);
   LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
