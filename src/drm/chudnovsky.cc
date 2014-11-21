@@ -40,6 +40,13 @@ void Chudnovsky::Compute(int64 digits, mpf_t pi) {
     FLAGS_threads = std::thread::hardware_concurrency();
   LOG(INFO) << "Number of threads: " << FLAGS_threads;
 
+  ComputeCore(num_terms, pi);
+
+  double all_end = GetTime();
+  LOG(INFO) << "Time of computing: " << (all_end - all_start) << " sec.";
+}
+
+void Chudnovsky::ComputeCore(int64 num_terms, mpf_t pi) {
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
@@ -49,37 +56,29 @@ void Chudnovsky::Compute(int64 digits, mpf_t pi) {
   mpz_clear(c);
   LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
 
-  mpz_mul_ui(b, b, 12);
-
   int64 bits_a = mpz_sizeinbase(a, 2);
   int64 bits_b = mpz_sizeinbase(b, 2);
   LOG(INFO) << "Size of a: " << bits_a << " bits";
   LOG(INFO) << "Size of b: " << bits_b << " bits";
   int64 bits = std::max(bits_a, bits_b);
-  mpf_set_default_prec(bits);
 
-  mpf_t p, q;
-  mpf_inits(p, q, NULL);
+  mpf_t q;
+  mpf_init(q);
 
-  mpf_set_z(p, a);
+  mpf_set_prec(pi, bits);
+  mpf_set_prec(q, bits);
+  mpf_set_z(pi, a);
   mpf_set_z(q, b);
 
   mpz_clears(a, b, NULL);
 
-  mpf_div(p, p, q);
+  mpf_div(pi, pi, q);
 
-  mpf_set_ui(q, kConstC * kConstC);
-  mpf_mul_ui(q, q, kConstC);
+  mpf_set_ui(q, (kConstC / 12) * (kConstC / 12) * kConstC);
   mpf_sqrt(q, q);
-  mpf_mul(p, p, q);
+  mpf_mul(pi, pi, q);
 
-  mpf_set_prec(pi, bits);
-  mpf_set(pi, p);
-
-  mpf_clears(p, q, NULL);
-
-  double all_end = GetTime();
-  LOG(INFO) << "Time of computing: " << (all_end - all_start) << " sec.";
+  mpf_clear(q);
 }
 
 void Chudnovsky::BinarySplit(int64 low, int64 up,
