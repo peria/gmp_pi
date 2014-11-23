@@ -40,9 +40,15 @@ void Chudnovsky::ComputeCore(int64 num_terms, mpf_t pi) {
   mpz_inits(a, b, c, NULL);
 
   double bs_start = base::GetTime();
-  BinarySplit(0, num_terms, a, b, c);
+  BinarySplit(1, num_terms, a, b, c);
   double bs_end = base::GetTime();
+
+  mpz_mul_ui(c, a, kConstB);
+  mpz_mul_ui(b, b, 5);
+  mpz_add(b, b, c);
+
   mpz_clear(c);
+  
   LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
 
   int64 bits_a = mpz_sizeinbase(a, 2);
@@ -95,14 +101,10 @@ void Chudnovsky::BinarySplit(int64 low, int64 up,
 
 void Chudnovsky::SetValues(int64 k, mpz_t a, mpz_t b, mpz_t c) {
   // a[k] = k^3 * C^3 / 24
-  if (k == 0) {
-    mpz_set_ui(a, 1);
-  } else {
-    int64 base = kConstC * k;
-    mpz_set_ui(a, base / 24);
-    mpz_mul_ui(a, a, base);
-    mpz_mul_ui(a, a, base);
-  }
+  int64 base = kConstC * k;
+  mpz_set_ui(a, base / 24);
+  mpz_mul_ui(a, a, base);
+  mpz_mul_ui(a, a, base);
 
   // b[k] = A * k + B;
   mpz_set_ui(b, kConstA * k);
