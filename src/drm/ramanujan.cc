@@ -8,6 +8,7 @@
 #include <ctime>
 
 #include "base/base.h"
+#include "base/time.h"
 
 namespace pi {
 
@@ -19,16 +20,10 @@ const int64 kConstA = 26390;
 const int64 kConstB = 1103;
 const int64 kConstC = 99 * 99 * 99 * 99;
 
-double GetTime() {
-  timeval t;
-  gettimeofday(&t, NULL);
-  return t.tv_sec + t.tv_usec * 1e-6;
-}
-  
 }  // namespace
 
 void Ramanujan::Compute(int64 digits, mpf_t pi) {
-  double all_start = GetTime();
+  double all_start = base::GetTime();
 
   int64 num_terms = digits / kDigsPerTerm + 5;
   LOG(INFO) << "Computing terms: " << num_terms;
@@ -36,7 +31,7 @@ void Ramanujan::Compute(int64 digits, mpf_t pi) {
 
   ComputeCore(num_terms, pi);
 
-  double all_end = GetTime();
+  double all_end = base::GetTime();
   LOG(INFO) << "Time of computing: " << (all_end - all_start) << " sec.";
 }
 
@@ -44,9 +39,9 @@ void Ramanujan::ComputeCore(int64 num_terms, mpf_t pi) {
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
-  double bs_start = GetTime();
+  double bs_start = base::GetTime();
   BinarySplit(0, num_terms, a, b, c);
-  double bs_end = GetTime();
+  double bs_end = base::GetTime();
   mpz_clear(c);
   LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
 

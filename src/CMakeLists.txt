@@ -39,6 +39,7 @@ function(pi_target_link_libraries target)
   target_link_libraries(${target} ${GFLAGS_LIBRARY})
   target_link_libraries(${target} ${GLOG_LIBRARY})
   target_link_libraries(${target} gmp)
+  target_link_libraries(${target} ${ARGN})
 endfunction()
 
 add_subdirectory(base)

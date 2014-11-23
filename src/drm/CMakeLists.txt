@@ -5,12 +5,11 @@ function(drm_add_library target)
 endfunction()
 
 function(drm_target_link_common_libraries target)
-  pi_target_link_libraries(drm_${target}_lib)
+  pi_target_link_libraries(drm_${target}_lib ${ARGN})
 endfunction()
 
 function(drm_target_link_libraries target)
-  # add other common libraries defined in drm/
-  drm_target_link_common_libraries(${target})
+  drm_target_link_common_libraries(${target} ${ARGN})
 endfunction()
 
 function(drm_add_executable exe)
@@ -28,11 +27,10 @@ endfunction()
 # Dependencies
 
 drm_add_library(chudnovsky chudnovsky.cc)
-drm_target_link_libraries(chudnovsky)
+drm_target_link_libraries(chudnovsky base_time_lib)
 
 drm_add_library(ramanujan ramanujan.cc)
-drm_target_link_libraries(ramanujan)
+drm_target_link_libraries(ramanujan base_time_lib)
 
 drm_add_executable(main main.cc)
-target_link_libraries(drm_main_exe drm_chudnovsky_lib)
-target_link_libraries(drm_main_exe drm_ramanujan_lib)
+target_link_libraries(drm_main_exe drm_chudnovsky_lib drm_ramanujan_lib)
