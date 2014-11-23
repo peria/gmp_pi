@@ -40,13 +40,16 @@ void Ramanujan::ComputeCore(int64 num_terms, mpf_t pi) {
   mpz_inits(a, b, c, NULL);
 
   double bs_start = base::GetTime();
-  BinarySplit(0, num_terms, a, b, c);
+  BinarySplit(1, num_terms, a, b, c);
   double bs_end = base::GetTime();
-  mpz_clear(c);
   LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
 
+  mpz_mul_ui(c, a, 4 * kConstB);
+  mpz_mul_ui(b, b, 96);
+  mpz_add(b, b, c);
   mpz_mul_ui(a, a, 99 * 99);
-  mpz_mul_ui(b, b, 4);
+
+  mpz_clear(c);
   int64 bits_a = mpz_sizeinbase(a, 2);
   int64 bits_b = mpz_sizeinbase(b, 2);
   LOG(INFO) << "Size of a: " << bits_a << " bits";
@@ -97,12 +100,8 @@ void Ramanujan::BinarySplit(int64 low, int64 up,
 
 void Ramanujan::SetValues(int64 k, mpz_t a, mpz_t b, mpz_t c) {
   // a[k] = k^3 * C * 32 (for k > 0)
-  if (k == 0) {
-    mpz_set_ui(a, 1);
-  } else {
-    mpz_set_ui(a, 32 * kConstC * k);
-    mpz_mul_ui(a, a, k * k);
-  }
+  mpz_set_ui(a, 32 * kConstC * k);
+  mpz_mul_ui(a, a, k * k);
 
   // b[k] = A * k + B;
   mpz_set_ui(b, kConstA * k);
