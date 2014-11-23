@@ -30,6 +30,9 @@ endfunction()
 drm_add_library(chudnovsky chudnovsky.cc)
 drm_target_link_libraries(chudnovsky)
 
-drm_add_executable(chudnovsky chudnovsky_main.cc)
-target_link_libraries(drm_chudnovsky_exe drm_chudnovsky_lib)
+drm_add_library(ramanujan ramanujan.cc)
+drm_target_link_libraries(ramanujan)
 
+drm_add_executable(main main.cc)
+target_link_libraries(drm_main_exe drm_chudnovsky_lib)
+target_link_libraries(drm_main_exe drm_ramanujan_lib)

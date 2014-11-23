@@ -5,7 +5,7 @@
 
 namespace pi {
 
-class Chudnovsky {
+class Ramanujan {
  public:
   static void Compute(int64 digits, mpf_t pi);
 
