@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <ctime>
+#include <iostream>
 
 #include "base/base.h"
 #include "base/time.h"
@@ -45,7 +46,7 @@ void Ramanujan::ComputeCore(int64 num_terms, mpf_t pi) {
   LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
 
   mpz_mul_ui(c, a, 4 * kConstB);
-  mpz_mul_ui(b, b, 96);
+  mpz_mul_ui(b, b, 12);
   mpz_add(b, b, c);
   mpz_mul_ui(a, a, 99 * 99);
 

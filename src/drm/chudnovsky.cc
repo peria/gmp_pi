@@ -45,7 +45,7 @@ void Chudnovsky::ComputeCore(int64 num_terms, mpf_t pi) {
 
   mpz_mul_ui(c, a, kConstB);
   mpz_mul_ui(b, b, 5);
-  mpz_add(b, b, c);
+  mpz_sub(b, c, b);
 
   mpz_clear(c);
   

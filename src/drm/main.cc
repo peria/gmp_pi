@@ -38,12 +38,13 @@ int main(int argc, char* argv[]) {
 
   if (FLAGS_check) {
     mpf_t answer;
-    mpf_init2(answer, 300);
-    mpf_set_str(answer, "3.141592653589793238462643383279502884197169399", 10);
+    mpf_init2(answer, 200);
+    mpf_set_str(answer, "3.141592653589793238462643383279502884197169399375", 10);
     mpf_sub(answer, answer, pi);
     int64 e;
     double d = mpf_get_d_2exp(&e, answer);
-    if (e > -280) {
+    std::cout << "Diff: " << d << " * 2^" << e << "\n";
+    if (e > -140) {
       std::cout << "** Wrong value **\n";
     }
     mpf_clear(answer);
