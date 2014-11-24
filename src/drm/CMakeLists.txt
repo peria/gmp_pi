@@ -27,7 +27,7 @@ endfunction()
 # Dependencies
 
 drm_add_library(chudnovsky chudnovsky.cc)
-drm_target_link_libraries(chudnovsky base_time_lib)
+drm_target_link_libraries(chudnovsky base_time_lib base_prime_lib)
 
 drm_add_library(ramanujan ramanujan.cc)
 drm_target_link_libraries(ramanujan base_time_lib)
