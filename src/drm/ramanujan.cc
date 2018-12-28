@@ -2,14 +2,12 @@
 
 #include <glog/logging.h>
 #include <gmp.h>
-#include <sys/time.h>
 #include <algorithm>
 #include <cstdio>
-#include <ctime>
 #include <iostream>
 
 #include "base/base.h"
-#include "base/time.h"
+#include "base/timer.h"
 
 namespace pi {
 
@@ -24,7 +22,7 @@ const int64 kConstC = 99 * 99 * 99 * 99;
 }  // namespace
 
 void Ramanujan::Compute(int64 digits, mpf_t pi) {
-  double all_start = base::GetTime();
+  base::Timer all_timer;
 
   int64 num_terms = digits / kDigsPerTerm + 5;
   LOG(INFO) << "Computing terms: " << num_terms;
@@ -32,18 +30,18 @@ void Ramanujan::Compute(int64 digits, mpf_t pi) {
 
   ComputeCore(num_terms, pi);
 
-  double all_end = base::GetTime();
-  LOG(INFO) << "Time of computing: " << (all_end - all_start) << " sec.";
+  all_timer.Stop();
+  LOG(INFO) << "Time of computing: " << all_timer.TimeInSec() << " sec.";
 }
 
 void Ramanujan::ComputeCore(int64 num_terms, mpf_t pi) {
   mpz_t a, b, c;
   mpz_inits(a, b, c, NULL);
 
-  double bs_start = base::GetTime();
+  base::Timer bs_timer;
   BinarySplit(1, num_terms, a, b, c);
-  double bs_end = base::GetTime();
-  LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
+  bs_timer.Stop();
+  LOG(INFO) << "Time of BS: " << bs_timer.TimeInSec() << " sec.";
 
   mpz_mul_ui(c, a, 4 * kConstB);
   mpz_mul_ui(b, b, 12);
@@ -115,4 +113,3 @@ void Ramanujan::SetValues(int64 k, mpz_t a, mpz_t b, mpz_t c) {
 }
 
 }  // namespace pi
-

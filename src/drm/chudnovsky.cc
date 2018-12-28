@@ -2,14 +2,12 @@
 
 #include <glog/logging.h>
 #include <gmp.h>
-#include <sys/time.h>
 #include <algorithm>
 #include <cstdio>
-#include <ctime>
 
 #include "base/base.h"
 #include "base/prime.h"
-#include "base/time.h"
+#include "base/timer.h"
 
 namespace pi {
 
@@ -20,11 +18,11 @@ const double kDigsPerTerm = 14.181647462725477;
 const int64 kConstA = 545140134;
 const int64 kConstB = 13591409;
 const int64 kConstC = 640320;
-  
+
 }  // namespace
 
 void Chudnovsky::Compute(int64 digits, mpf_t pi) {
-  double all_start = base::GetTime();
+  base::Timer all_timer;
 
   int64 num_terms = digits / kDigsPerTerm + 5;
   LOG(INFO) << "Computing terms: " << num_terms;
@@ -32,8 +30,8 @@ void Chudnovsky::Compute(int64 digits, mpf_t pi) {
 
   ComputeCore(num_terms, pi);
 
-  double all_end = base::GetTime();
-  LOG(INFO) << "Time of computing: " << (all_end - all_start) << " sec.";
+  all_timer.Stop();
+  LOG(INFO) << "Time of computing: " << all_timer.TimeInSec() << " sec.";
 }
 
 namespace {
@@ -50,14 +48,14 @@ void Chudnovsky::ComputeCore(int64 num_terms, mpf_t pi) {
   LOG(INFO) << "Computing tournaments: " << num_tournament;
   InitTournament(kTournamentLevel);
 
-  double bs_start = base::GetTime();
+  base::Timer bs_timer;
   if (num_tournament == 1) {
     LOG(INFO) << "Direct PT";
     PerfectTournament(0, kTournamentWidth, kTournamentLevel, a, b, c);
   } else {
     BinarySplit(0, num_tournament, a, b, c);
   }
-  double bs_end = base::GetTime();
+  bs_timer.Stop();
 
   mpz_set_ui(c, 1);
   for (int64 i = 0; i < kTournamentLevel; ++i) {
@@ -65,14 +63,14 @@ void Chudnovsky::ComputeCore(int64 num_terms, mpf_t pi) {
     mpz_clear(g_factor[i]);
   }
   mpz_mul(a, a, c);
-  
+
   mpz_mul_ui(b, b, 5);
   mpz_submul_ui(b, a, kConstB);
   mpz_neg(a, a);
 
   mpz_clear(c);
-  
-  LOG(INFO) << "Time of BS: " << (bs_end - bs_start) << " sec.";
+
+  LOG(INFO) << "Time of BS: " << bs_timer.TimeInSec() << " sec.";
 
   int64 bits_a = mpz_sizeinbase(a, 2);
   int64 bits_b = mpz_sizeinbase(b, 2);

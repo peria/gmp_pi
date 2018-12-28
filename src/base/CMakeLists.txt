@@ -20,6 +20,4 @@ endfunction()
 
 # ----------
 # Dependencies
-base_add_library(time time.cc)
-
 base_add_library(prime prime.cc)

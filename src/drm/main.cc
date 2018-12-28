@@ -26,7 +26,7 @@ enum Formula {
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
+  // google::InitGoogleLogging(argv[0]);
 
   mpf_t pi;
   mpf_init(pi);
