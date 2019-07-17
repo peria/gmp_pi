@@ -193,7 +193,7 @@ struct CFrac : public Bench {
   }
 
   double compute(const int64 n) override {
-    int64 k = (n + 1 - std::log2(d) / 2) / (alpha - beta) * 310 + 1;
+    int64 k = (n - 1 - std::log2(d) / 2) / (std::log2(alpha) - std::log2(beta)) + 1;
     Timer timer;
     Matrix am = Power(m, k);
     mpf_class r(am[0][0], n + n / 10);
