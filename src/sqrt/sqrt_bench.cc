@@ -34,6 +34,7 @@ private:
 };
 
 struct Bench {
+  virtual ~Bench() = default;
   virtual double compute(const int64 n) = 0;
   void getDiff(const mpf_class& r) {
     mpf_class rdiff = abs(answer - r);
@@ -196,8 +197,10 @@ struct CFrac : public Bench {
     int64 k = (n - 1 - std::log2(d) / 2) / (std::log2(alpha) - std::log2(beta)) + 1;
     Timer timer;
     Matrix am = Power(m, k);
-    mpf_class r(am[0][0], n + n / 10);
-    mpf_class s(am[0][1], n + n / 10);
+    mpz_class& zr = am[0][0];
+    mpz_class& zs = am[0][1];
+    mpf_class r(zr, n + n / 10);
+    mpf_class s(zs, n + n / 10);
     r /= s;
     r -= static_cast<int>(std::sqrt(d));
     double t = timer.getTime();
